@@ -1,4 +1,7 @@
+from dotenv import load_dotenv
 import os
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path=dotenv_path)
 import datetime
 import sys
 from coupang_api import CoupangApiHandler # v1 핸들러 임포트
