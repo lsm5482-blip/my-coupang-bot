@@ -21,14 +21,14 @@ jobs:
         
     - name: Install Dependencies
       run: |
-        pip install requests python-dotenv  # <-- 'python-dotenv'를 여기에 추가!
+        pip install requests python-dotenv  # <-- 'dotenv' 오류 해결
         
     - name: Run Script
       env:
         COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
         COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         COUPANG_CHANNEL_ID: ${{ secrets.COUPANG_CHANNEL_ID }}
-        TZ: 'Asia/Seoul'  # <-- 🇰🇷 이 줄을 추가하세요!
+        TZ: 'Asia/Seoul'  # <-- '한국 시간' 오류 해결
       run: |
         python make_html.py
         
@@ -37,4 +37,3 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./docs
-
