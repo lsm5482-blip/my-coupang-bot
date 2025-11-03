@@ -14,6 +14,8 @@ def create_product_card(item):
     product_image = item.get('productImage', '')
     product_name = item.get('productName', '상품명 없음')
     product_price = item.get('productPrice', 0)
+    is_rocket = item.get('isRocket', False)
+    is_free_shipping = item.get('isFreeShipping', False)
     
     # 가격 포맷팅 (예: 10000 -> 10,000)
     try:
@@ -21,8 +23,16 @@ def create_product_card(item):
     except ValueError:
         price_formatted = product_price
 
+    # 배지 생성
+    badge_html = ''
+    if is_rocket:
+        badge_html = '<span class="badge rocket">🚀 로켓</span>'
+    elif is_free_shipping:
+        badge_html = '<span class="badge free-shipping">🚚 무료배송</span>'
+
     return f"""
     <div class="product-card">
+        {badge_html}
         <a href="{product_url}" target="_blank" rel="noopener sponsored">
             <img src="{product_image}" alt="{product_name}" loading="lazy">
             <div class="product-info">
@@ -73,13 +83,30 @@ def main():
         with open('template.html', 'r', encoding='utf-8') as f:
             template = f.read()
 
-        # 5. 템플릿에 데이터 치환
+        # 5. 메인 콘텐츠 HTML 생성 (Goldbox와 Bestseller를 나란히 배치)
+        main_content_html = f"""
+        <div class="main-content-split">
+            <div class="goldbox-section">
+                <h2 class="section-title">✨ 골드박스 특가</h2>
+                <div class="grid-container">
+                    {goldbox_html}
+                </div>
+            </div>
+            <div class="bestseller-section">
+                <h2 class="section-title">🚀 베스트셀러 (패션의류/잡화)</h2>
+                <div class="grid-container">
+                    {bestseller_html}
+                </div>
+            </div>
+        </div>
+        """
+
+        # 6. 템플릿에 데이터 치환
         now = datetime.datetime.now().strftime("%Y년 %m월 %d일 %H시 %M분")
         output_html = template.replace("%%UPDATE_TIME%%", f"{now} 기준")
-        output_html = output_html.replace("%%GOLDBOX_CARDS%%", goldbox_html)
-        output_html = output_html.replace("%%BESTSELLER_CARDS%%", bestseller_html)
+        output_html = output_html.replace("%%MAIN_CONTENT%%", main_content_html)
 
-        # 6. 최종 index.html 파일 저장
+        # 7. 최종 index.html 파일 저장
         output_dir = './docs'
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
