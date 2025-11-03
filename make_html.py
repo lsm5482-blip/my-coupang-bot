@@ -4,7 +4,7 @@ coupang_api.py 모듈을 사용하여 추천 상품 데이터를 가져와 index
 """
 import os
 from datetime import datetime
-import coupang_api
+from coupang_api import CoupangApiHandler
 
 
 def escape_html(text):
@@ -126,7 +126,8 @@ def main():
     try:
         # 1. 추천 상품 조회
         print("\n[1/3] 추천 상품 조회 중...")
-        recommended_products = coupang_api.get_recommended_products()
+        api_handler = CoupangApiHandler()
+        recommended_products = api_handler.get_recommended_products()
         print(f"✓ 추천 상품 {len(recommended_products)}개 조회 완료")
         
         # 2. HTML 카드 생성
