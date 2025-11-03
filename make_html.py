@@ -50,63 +50,82 @@ def main():
     
     try:
         # 1. API 핸들러 초기화
-        print("[1/3] 쿠팡 API 핸들러 초기화...")
+        print("[1/4] 쿠팡 API 핸들러 초기화...")
         api_handler = CoupangApiHandler()
         
-        # 2. 상품 데이터 조회
-        print("[2/3] 상품 데이터 조회 시작...")
+        # 2. 카테고리 설정
+        CATEGORIES_TO_DISPLAY = {
+            '가전디지털': '1016',
+            '헬스/건강식품': '1024',
+            '여성패션': '1001'
+        }
+        
+        # 3. 상품 데이터 조회
+        print("[2/4] 상품 데이터 조회 시작...")
         
         # 골드박스 상품 조회
         print("  - 골드박스 상품 조회 중...")
         goldbox_items = api_handler.get_goldbox_products()
         
-        # 베스트셀러 상품 조회 (카테고리 1001 = 패션)
-        print("  - 베스트셀러(1001) 상품 조회 중...")
-        bestseller_items = api_handler.get_bestseller_products(category_id="1001")
+        # 카테고리별 베스트셀러 상품 조회
+        category_data = {}
+        for category_name, category_id in CATEGORIES_TO_DISPLAY.items():
+            print(f"  - 베스트셀러({category_name}, {category_id}) 상품 조회 중...")
+            items = api_handler.get_bestseller_products(category_id=category_id)
+            category_data[category_name] = items
         
-        if not goldbox_items and not bestseller_items:
+        if not goldbox_items and not any(category_data.values()):
             print("❌ 골드박스와 베스트셀러 상품을 모두 불러오지 못했습니다. API 로그를 확인하세요.")
             # 실패해도 빈 페이지만 만들도록 스크립트를 중단하지는 않습니다.
         
-        # 3. HTML 카드 생성
-        print("[3/3] HTML 코드 생성 중...")
+        # 4. HTML 카드 생성
+        print("[3/4] HTML 코드 생성 중...")
         goldbox_html = "".join([create_product_card(item) for item in goldbox_items])
-        bestseller_html = "".join([create_product_card(item) for item in bestseller_items])
         
         if not goldbox_html:
             goldbox_html = "<p>오늘의 골드박스 상품을 불러오는 데 실패했습니다.</p>"
-            
-        if not bestseller_html:
-            bestseller_html = "<p>오늘의 베스트셀러 상품을 불러오는 데 실패했습니다.</p>"
+        
+        # 카테고리별 HTML 카드 생성
+        category_htmls = {}
+        for category_name, items in category_data.items():
+            category_html = "".join([create_product_card(item) for item in items])
+            if not category_html:
+                category_html = f"<p>{category_name} 카테고리의 베스트셀러 상품을 불러오는 데 실패했습니다.</p>"
+            category_htmls[category_name] = category_html
 
-        # 4. 템플릿 파일 읽기
+        # 5. 템플릿 파일 읽기
         with open('template.html', 'r', encoding='utf-8') as f:
             template = f.read()
 
-        # 5. 메인 콘텐츠 HTML 생성 (Goldbox와 Bestseller를 나란히 배치)
+        # 6. 메인 콘텐츠 HTML 생성
+        print("[4/4] HTML 구조 생성 중...")
         main_content_html = f"""
-        <div class="main-content-split">
-            <div class="goldbox-section">
-                <h2 class="section-title">✨ 골드박스 특가</h2>
-                <div class="grid-container">
-                    {goldbox_html}
-                </div>
-            </div>
-            <div class="bestseller-section">
-                <h2 class="section-title">🚀 베스트셀러 (패션의류/잡화)</h2>
-                <div class="grid-container">
-                    {bestseller_html}
-                </div>
+        <div class="goldbox-section">
+            <h2 class="section-title">✨ 골드박스 특가</h2>
+            <div class="grid-container">
+                {goldbox_html}
             </div>
         </div>
-        """
+"""
+        
+        # 카테고리별 섹션 추가
+        for category_name in CATEGORIES_TO_DISPLAY.keys():
+            category_html = category_htmls.get(category_name, "<p>상품을 불러오는 데 실패했습니다.</p>")
+            main_content_html += f"""
+        <div class="category-section">
+            <h2 class="section-title" style="margin-top: 40px;">🔥 {category_name} 베스트셀러</h2>
+            <div class="grid-container">
+                {category_html}
+            </div>
+        </div>
+"""
 
-        # 6. 템플릿에 데이터 치환
+        # 7. 템플릿에 데이터 치환
         now = datetime.datetime.now().strftime("%Y년 %m월 %d일 %H시 %M분")
         output_html = template.replace("%%UPDATE_TIME%%", f"{now} 기준")
         output_html = output_html.replace("%%MAIN_CONTENT%%", main_content_html)
 
-        # 7. 최종 index.html 파일 저장
+        # 8. 최종 index.html 파일 저장
         output_dir = './docs'
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
