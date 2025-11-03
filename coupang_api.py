@@ -59,7 +59,7 @@ def get_goldbox_products():
     """
     골드박스 상품 목록을 조회하는 API를 호출합니다.
     
-    API 엔드포인트: GET /v2/providers/affiliate_open_api/apis/openapi/v1/deeplink/goldbox
+    API 엔드포인트: GET /v2/providers/affiliate_open_api/apis/openapi/products/goldbox
     
     Returns:
         list: 상품 목록의 JSON 리스트. 오류 발생 시 빈 리스트 반환.
@@ -70,7 +70,7 @@ def get_goldbox_products():
             return []
         
         method = 'GET'
-        path = '/v2/providers/affiliate_open_api/apis/openapi/v1/deeplink/goldbox'
+        path = '/v2/providers/affiliate_open_api/apis/openapi/products/goldbox'
         query = ''
         
         # HMAC 서명 생성
@@ -127,7 +127,7 @@ def get_bestseller_products(category_id):
     """
     특정 카테고리의 베스트셀러 상품 목록을 조회하는 API를 호출합니다.
     
-    API 엔드포인트: GET /v2/providers/affiliate_open_api/apis/openapi/v1/products/best-categories/{categoryId}
+    API 엔드포인트: GET /v2/providers/affiliate_open_api/apis/openapi/products/bestcategories/{categoryId}
     
     Args:
         category_id (str): 조회할 카테고리의 ID
@@ -145,7 +145,7 @@ def get_bestseller_products(category_id):
             return []
         
         method = 'GET'
-        path = f'/v2/providers/affiliate_open_api/apis/openapi/v1/products/best-categories/{category_id}'
+        path = f'/v2/providers/affiliate_open_api/apis/openapi/products/bestcategories/{category_id}'
         query = ''
         
         # HMAC 서명 생성
