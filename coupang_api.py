@@ -1,152 +1,99 @@
-"""
-쿠팡 파트너스 API 호출 전담 모듈 (v2)
-HMAC 서명 기반 인증을 사용하여 쿠팡 파트너스 API v2를 호출합니다.
-"""
 import requests
-import os
+import json
+import time
 import hmac
 import hashlib
-import json
-import datetime
+import os
+import sys # 오류 출력을 위해 추가
 
-
-# 환경 변수에서 API 키 가져오기
-ACCESS_KEY = os.environ.get('COUPANG_ACCESS_KEY')
-SECRET_KEY = os.environ.get('COUPANG_SECRET_KEY')
-CHANNEL_ID = os.environ.get('COUPANG_CHANNEL_ID')
-
-# 쿠팡 파트너스 API 베이스 URL
-BASE_URL = 'https://api-gateway.coupang.com'
-
-
-def generate_hmac(method, path, body=''):
+class CoupangApiHandler:
     """
-    HMAC 서명을 생성합니다.
-    쿠팡 파트너스 API v2 공식 문서에 따라 HMAC-SHA256 서명을 생성합니다.
-    POST 요청 시 JSON body를 포함하여 서명을 생성합니다.
-    
-    Args:
-        method (str): HTTP 메서드 (예: 'GET', 'POST')
-        path (str): 요청 경로 (예: '/v2/providers/affiliate_open_api/apis/openapi/v2/products/reco')
-        body (str): JSON body 문자열 (POST 요청 시 사용, 없을 경우 빈 문자열)
-    
-    Returns:
-        tuple: (Authorization 헤더 문자열, 타임스탬프)
+    쿠팡 파트 K너스 Reco API (v2) 핸들러
+    'POST' 방식 + 'JSON Body'를 포함하는 HMAC 서명 구현
     """
-    try:
-        # 타임스탬프 생성 (밀리초 단위)
-        timestamp = str(int(datetime.datetime.utcnow().timestamp() * 1000))
-        
-        # 서명 메시지 생성: timestamp + method + path + body
-        # v2 API는 POST 방식이며 JSON body를 포함하여 서명 생성
-        message = f'{timestamp}{method}{path}{body}'
-        
-        # HMAC-SHA256 서명 생성
-        signature = hmac.new(
-            SECRET_KEY.encode('utf-8'),
-            message.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
-        
-        # Authorization 헤더 형식: CEA algorithm=HmacSHA256, access-key={ACCESS_KEY}, signed-date={timestamp}, signature={signature}
-        auth_header = f'CEA algorithm=HmacSHA256, access-key={ACCESS_KEY}, signed-date={timestamp}, signature={signature}'
-        
-        return auth_header, timestamp
-    
-    except Exception as e:
-        print(f'HMAC 서명 생성 중 오류 발생: {e}')
-        raise
 
+    def __init__(self):
+        try:
+            self.access_key = os.environ['COUPANG_ACCESS_KEY']
+            self.secret_key = os.environ['COUPANG_SECRET_KEY']
+            self.channel_id = os.environ['COUPANG_CHANNEL_ID']
+        except KeyError as e:
+            print(f"❌ 치명적 오류: GitHub Secrets에 {e}가 설정되지 않았습니다.", file=sys.stderr)
+            sys.exit(1) # Secrets 없이는 실행 불가능하므로 종료
 
-def get_recommended_products():
-    """
-    추천 상품 목록을 조회하는 API를 호출합니다.
-    쿠팡 파트너스 API v2의 reco 엔드포인트를 POST 방식으로 호출합니다.
-    
-    API 엔드포인트: POST /v2/providers/affiliate_open_api/apis/openapi/v2/products/reco
-    
-    Returns:
-        list: 상품 목록의 JSON 리스트. 오류 발생 시 빈 리스트 반환.
-    """
-    try:
-        if not ACCESS_KEY or not SECRET_KEY:
-            print('경고: 쿠팡 API 키가 설정되지 않았습니다.')
-            return []
+        self.base_url = "https://api-gateway.coupang.com"
+        print("🔑 쿠팡 Reco API 핸들러 초기화 완료 (POST + Body HMAC 기준)")
+
+    def get_recommended_products(self):
+        """
+        Reco API (v2)를 호출하여 추천 상품 목록을 가져옵니다.
+        'POST' + 'Body' HMAC 서명 로직을 100% 준수합니다.
+        """
+        METHOD = "POST"
+        PATH = "/v2/providers/affiliate_open_api/apis/openapi/v2/products/reco"
         
-        method = 'POST'
-        path = '/v2/providers/affiliate_open_api/apis/openapi/v2/products/reco'
-        
-        # 필수 JSON body 구성 (v2 API 파라미터 예제)
-        request_body = {
-            'device': {
-                'id': 'TEMP_DEVICE_ID',
-                'lmt': 0
-            },
-            'imp': {
-                'imageSize': '200x200'
-            },
-            'user': {
-                'puid': 'TEMP_USER_ID'
-            },
-            'affiliate': {
-                'subId': CHANNEL_ID
+        try:
+            # 1. GMT 날짜시간 생성
+            os.environ['TZ'] = 'GMT+0'
+            datetime_gmt = time.strftime('%y%m%d', time.gmtime()) + 'T' + time.strftime('%H%M%S', time.gmtime()) + 'Z'
+            
+            # 2. POST Body (JSON) 구성
+            body = {
+                "device": { "id": "TEMP_DEVICE_ID", "lmt": 0 },
+                "imp": { "imageSize": "200x200" },
+                "user": { "puid": "TEMP_USER_ID" },
+                "affiliate": { "subId": self.channel_id }
             }
-        }
-        
-        # JSON body를 문자열로 변환 (서명 생성용)
-        body_str = json.dumps(request_body, separators=(',', ':'), ensure_ascii=False)
-        
-        # HMAC 서명 생성 (POST 요청이므로 body 포함)
-        auth_header, timestamp = generate_hmac(method, path, body_str)
-        
-        # API 요청 URL 구성
-        url = f'{BASE_URL}{path}'
-        
-        # 요청 헤더 설정
-        headers = {
-            'Authorization': auth_header,
-            'Content-Type': 'application/json;charset=UTF-8'
-        }
-        
-        # POST 요청 실행
-        response = requests.post(url, headers=headers, json=request_body, timeout=30)
-        response.raise_for_status()
-        
-        # JSON 응답 파싱
-        result = response.json()
-        
-        # 응답 구조에 따라 데이터 추출
-        if isinstance(result, dict):
-            # 일반적인 응답 구조: {'data': [...], 'rCode': '0', ...}
-            if 'data' in result:
-                data = result['data']
-                if isinstance(data, list):
-                    return data
-                elif isinstance(data, dict):
-                    # data가 딕셔너리인 경우, products 키가 있을 수 있음
-                    if 'products' in data:
-                        return data['products']
-                    elif 'items' in data:
-                        return data['items']
-            elif 'rCode' in result and result.get('rCode') == '0':
-                # 성공 응답이지만 상품 리스트가 다른 키에 있을 수 있음
-                return result.get('data', [])
-        elif isinstance(result, list):
-            return result
-        
-        return []
-    
-    except requests.exceptions.RequestException as e:
-        print(f'추천 상품 조회 API 호출 실패: {e}')
-        if hasattr(e, 'response') and e.response is not None:
-            try:
-                print(f'응답 내용: {e.response.text}')
-            except:
-                pass
-        return []
-    
-    except Exception as e:
-        print(f'추천 상품 조회 중 예상치 못한 오류 발생: {e}')
-        import traceback
-        traceback.print_exc()
-        return []
+            
+            # 3. ★★★ HMAC 서명 생성 (가장 중요) ★★★
+            # 'reco' API는 'body'를 공백 없이 JSON 문자열로 만들어 서명에 포함해야 함
+            body_json_string = json.dumps(body, separators=(',', ':'))
+            message = datetime_gmt + METHOD + PATH + body_json_string
+            
+            signature = hmac.new(
+                self.secret_key.encode('utf-8'),
+                message.encode('utf-8'),
+                hashlib.sha256
+            ).hexdigest()
+            
+            # 4. Authorization 헤더 완성
+            authorization = (
+                f"CEA algorithm=HmacSHA256, "
+                f"access-key={self.access_key}, "
+                f"signed-date={datetime_gmt}, "
+                f"signature={signature}"
+            )
+            
+            # 5. API 요청 구성
+            url = self.base_url + PATH
+            headers = {
+                "Authorization": authorization,
+                "Content-Type": "application/json;charset=UTF-8"
+            }
+            
+            print(f"🚀 Reco API 호출 시작 (Path: {PATH})")
+            print(f"   Sub-ID: {self.channel_id}")
+            
+            # 6. API 호출
+            response = requests.post(url, headers=headers, json=body)
+            response.raise_for_status() # 200번대가 아니면 오류 발생
+            
+            result_json = response.json()
+            
+            print("✅ Reco API 호출 성공! 상품 데이터를 반환합니다.")
+            return result_json.get('data', []) # 상품 리스트 반환
+
+        except requests.exceptions.RequestException as e:
+            print(f"❌ API 호출 실패: {e}", file=sys.stderr)
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"    - 상태 코드: {e.response.status_code}", file=sys.stderr)
+                print(f"    - 응답 내용: {e.response.text}", file=sys.stderr)
+            return [] # 실패 시 빈 리스트 반환
+            
+        except Exception as e:
+            print(f"❌ 예상치 못한 오류: {e}", file=sys.stderr)
+            return [] # 실패 시 빈 리스트 반환
+
+# --- 아래 코드는 GitHub Actions에서는 실행되지 않지만,
+# --- main.py와 make_html.py가 사용할 클래스를 정의합니다.
+# --- (이 파일 자체는 클래스 정의 파일입니다)
