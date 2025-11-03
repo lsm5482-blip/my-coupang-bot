@@ -1,0 +1,38 @@
+name: 쿠팡 딜 사이트 자동 업데이트 및 배포
+
+on:
+  schedule:
+    - cron: '0 * * * *' # 1시간마다
+  workflow_dispatch:  # 수동 실행
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install Dependencies
+      run: |
+        pip install requests python-dotenv # <-- dotenv 설치
+
+    - name: Run Script
+      env:
+        COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
+        COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
+        COUPANG_CHANNEL_ID: ${{ secrets.COUPANG_CHANNEL_ID }}
+        TZ: 'Asia/Seoul' # <-- 한국 시간
+      run: |
+        python make_html.py
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
