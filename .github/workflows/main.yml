@@ -28,6 +28,7 @@ jobs:
         COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
         COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         COUPANG_CHANNEL_ID: ${{ secrets.COUPANG_CHANNEL_ID }}
+        TZ: 'Asia/Seoul'  # <-- 🇰🇷 이 줄을 추가하세요!
       run: |
         python make_html.py
         
