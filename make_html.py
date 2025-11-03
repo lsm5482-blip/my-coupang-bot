@@ -1,6 +1,6 @@
 """
 쿠팡 파트너스 딜 사이트 HTML 생성 스크립트
-coupang_api.py 모듈을 사용하여 상품 데이터를 가져와 index.html을 생성합니다.
+coupang_api.py 모듈을 사용하여 추천 상품 데이터를 가져와 index.html을 생성합니다.
 """
 import os
 from datetime import datetime
@@ -56,12 +56,12 @@ def generate_product_card(product):
         str: HTML 카드 문자열
     """
     # 상품 데이터 추출 (쿠팡 API 응답 구조에 따라 키명이 다를 수 있음)
-    product_name = escape_html(product.get('productName') or product.get('title') or '상품명 없음')
-    product_price = product.get('productPrice') or product.get('price') or product.get('salePrice') or 0
-    product_image = product.get('productImage') or product.get('imageUrl') or product.get('image') or ''
-    product_url = product.get('productUrl') or product.get('link') or product.get('url') or '#'
-    discount_rate = product.get('discountRate') or product.get('discount') or 0
-    category_name = escape_html(product.get('categoryName') or product.get('category') or '')
+    product_name = escape_html(product.get('productName') or product.get('title') or product.get('name') or '상품명 없음')
+    product_price = product.get('productPrice') or product.get('price') or product.get('salePrice') or product.get('finalPrice') or 0
+    product_image = product.get('productImage') or product.get('imageUrl') or product.get('image') or product.get('thumbnailImageUrl') or ''
+    product_url = product.get('productUrl') or product.get('link') or product.get('url') or product.get('affiliateLink') or '#'
+    discount_rate = product.get('discountRate') or product.get('discount') or product.get('discountPercentage') or 0
+    category_name = escape_html(product.get('categoryName') or product.get('category') or product.get('category1Name') or '')
     
     # 할인 전 가격 계산 (할인율이 있는 경우)
     try:
@@ -89,8 +89,11 @@ def generate_product_card(product):
 '''
     
     # 할인 배지 (있는 경우)
-    if discount_rate and float(discount_rate) > 0:
-        card_html += f'                    <span class="discount-badge">{int(discount_rate)}%</span>\n'
+    try:
+        if discount_rate and float(discount_rate) > 0:
+            card_html += f'                    <span class="discount-badge">{int(float(discount_rate))}%</span>\n'
+    except (ValueError, TypeError):
+        pass
     
     card_html += f'''                </div>
                 <div class="product-info">
@@ -121,39 +124,25 @@ def main():
     print("=" * 50)
     
     try:
-        # 1. 골드박스 상품 조회
-        print("\n[1/4] 골드박스 상품 조회 중...")
-        goldbox_products = coupang_api.get_goldbox_products()
-        print(f"✓ 골드박스 상품 {len(goldbox_products)}개 조회 완료")
+        # 1. 추천 상품 조회
+        print("\n[1/3] 추천 상품 조회 중...")
+        recommended_products = coupang_api.get_recommended_products()
+        print(f"✓ 추천 상품 {len(recommended_products)}개 조회 완료")
         
-        # 2. 베스트셀러 상품 조회 (카테고리 ID: 1001)
-        print("\n[2/4] 베스트셀러 상품 조회 중...")
-        bestseller_products = coupang_api.get_bestseller_products(category_id='1001')
-        print(f"✓ 베스트셀러 상품 {len(bestseller_products)}개 조회 완료")
+        # 2. HTML 카드 생성
+        print("\n[2/3] HTML 카드 생성 중...")
         
-        # 3. HTML 카드 생성
-        print("\n[3/4] HTML 카드 생성 중...")
-        
-        # 골드박스 카드 생성
-        goldbox_cards_html = ''
-        if goldbox_products:
-            for product in goldbox_products:
-                goldbox_cards_html += generate_product_card(product)
+        recommended_cards_html = ''
+        if recommended_products:
+            for product in recommended_products:
+                recommended_cards_html += generate_product_card(product)
         else:
-            goldbox_cards_html = '<p style="text-align: center; padding: 40px; color: #999;">골드박스 상품을 불러오는 중...</p>'
+            recommended_cards_html = '<p style="text-align: center; padding: 40px; color: #999;">추천 상품을 불러오는 중...</p>'
         
-        # 베스트셀러 카드 생성
-        bestseller_cards_html = ''
-        if bestseller_products:
-            for product in bestseller_products:
-                bestseller_cards_html += generate_product_card(product)
-        else:
-            bestseller_cards_html = '<p style="text-align: center; padding: 40px; color: #999;">베스트셀러 상품을 불러오는 중...</p>'
+        print(f"✓ 추천 상품 카드 {len(recommended_products)}개 생성 완료")
         
-        print(f"✓ 골드박스 카드 {len(goldbox_products)}개, 베스트셀러 카드 {len(bestseller_products)}개 생성 완료")
-        
-        # 4. template.html 읽기
-        print("\n[4/4] HTML 템플릿 로드 및 치환 중...")
+        # 3. template.html 읽기
+        print("\n[3/3] HTML 템플릿 로드 및 치환 중...")
         template_path = 'template.html'
         
         if not os.path.exists(template_path):
@@ -162,28 +151,26 @@ def main():
         with open(template_path, 'r', encoding='utf-8') as f:
             html_template = f.read()
         
-        # 5. 치환 작업
+        # 4. 치환 작업
         current_time = datetime.now().strftime('%Y년 %m월 %d일 %H시 %M분')
         final_html = (html_template
                      .replace('%%UPDATE_TIME%%', current_time)
-                     .replace('%%GOLDBOX_CARDS%%', goldbox_cards_html)
-                     .replace('%%BESTSELLER_CARDS%%', bestseller_cards_html))
+                     .replace('%%RECOMMENDED_PRODUCTS%%', recommended_cards_html))
         
-        # 6. docs 폴더 생성 (없는 경우)
+        # 5. docs 폴더 생성 (없는 경우)
         docs_dir = './docs'
         if not os.path.exists(docs_dir):
             os.makedirs(docs_dir)
             print(f"✓ docs 폴더 생성 완료")
         
-        # 7. index.html 저장
+        # 6. index.html 저장
         output_path = './docs/index.html'
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(final_html)
         
         print(f"\n✅ HTML 생성 완료!")
         print(f"   저장 경로: {output_path}")
-        print(f"   골드박스: {len(goldbox_products)}개")
-        print(f"   베스트셀러: {len(bestseller_products)}개")
+        print(f"   추천 상품: {len(recommended_products)}개")
         print(f"   업데이트 시간: {current_time}")
         print("=" * 50)
         
@@ -201,4 +188,3 @@ def main():
 
 if __name__ == '__main__':
     exit(main())
-
