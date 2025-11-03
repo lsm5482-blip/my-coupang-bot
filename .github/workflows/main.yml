@@ -21,7 +21,7 @@ jobs:
         
     - name: Install Dependencies
       run: |
-        pip install requests
+        pip install requests python-dotenv  # <-- 'python-dotenv'를 여기에 추가!
         
     - name: Run Script
       env:
