@@ -2,42 +2,45 @@ from dotenv import load_dotenv
 import os
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path=dotenv_path)
-import datetime
+from datetime import datetime, timedelta
 import sys
 from coupang_api import CoupangApiHandler # v1 핸들러 임포트
 
 def create_product_card(item):
     """쿠팡 API 응답(item)으로 HTML 카드 1개를 생성"""
     
-    # v1 API 응답 필드명 (productUrl, productImage, productName, productPrice)
+    # 기획전 API 응답 필드명
     product_url = item.get('productUrl', '#')
     product_image = item.get('productImage', '')
     product_name = item.get('productName', '상품명 없음')
-    product_price = item.get('productPrice', 0)
-    is_rocket = item.get('isRocket', False)
-    is_free_shipping = item.get('isFreeShipping', False)
+    original_price = item.get('originalPrice', 0)
+    sale_price = item.get('salePrice', 0)
+    discount_rate = item.get('discountRate', 0)
     
-    # 가격 포맷팅 (예: 10000 -> 10,000)
+    # 가격 포맷팅 (천 단위 콤마)
     try:
-        price_formatted = f"{int(product_price):,}"
-    except ValueError:
-        price_formatted = product_price
+        original_price_formatted = f"{int(original_price):,}"
+        sale_price_formatted = f"{int(sale_price):,}"
+    except (ValueError, TypeError):
+        original_price_formatted = str(original_price)
+        sale_price_formatted = str(sale_price)
 
-    # 배지 생성
-    badge_html = ''
-    if is_rocket:
-        badge_html = '<span class="badge rocket">🚀 로켓</span>'
-    elif is_free_shipping:
-        badge_html = '<span class="badge free-shipping">🚚 무료배송</span>'
+    # 할인율 배지 생성
+    discount_badge = ''
+    if discount_rate > 0:
+        discount_badge = f'<span class="discount-badge">{int(discount_rate)}% OFF</span>'
 
     return f"""
     <div class="product-card">
-        {badge_html}
+        {discount_badge}
         <a href="{product_url}" target="_blank" rel="noopener sponsored">
             <img src="{product_image}" alt="{product_name}" loading="lazy">
             <div class="product-info">
                 <div class="product-name">{product_name}</div>
-                <div class="product-price">{price_formatted}원</div>
+                <div class="product-price-container">
+                    {f'<span class="original-price">{original_price_formatted}원</span>' if original_price > 0 else ''}
+                    <span class="sale-price">{sale_price_formatted}원</span>
+                </div>
             </div>
         </a>
     </div>
@@ -63,9 +66,53 @@ def main():
         # 3. 상품 데이터 조회
         print("[2/4] 상품 데이터 조회 시작...")
         
-        # 골드박스 상품 조회
-        print("  - 골드박스 상품 조회 중...")
-        goldbox_items = api_handler.get_goldbox_products()
+        # 기획전 목록 조회
+        print("  - 기획전 목록 조회 중...")
+        event_list = api_handler.get_special_event_list()
+        
+        if not event_list:
+            print("❌ 기획전 목록을 불러오지 못했습니다.")
+            event_items = []
+        else:
+            # 첫 번째 기획전 ID 가져오기
+            event_id = None
+            if isinstance(event_list, list) and len(event_list) > 0:
+                event_id = event_list[0].get('eventId') or event_list[0].get('id')
+            elif isinstance(event_list, dict):
+                # data 안에 리스트가 있을 수 있음
+                data = event_list.get('data', [])
+                if isinstance(data, list) and len(data) > 0:
+                    event_id = data[0].get('eventId') or data[0].get('id')
+            
+            if event_id:
+                print(f"  - 기획전 ID: {event_id} 상품 조회 중...")
+                event_items = api_handler.get_special_event_products(event_id)
+            else:
+                print("❌ 기획전 ID를 찾을 수 없습니다.")
+                event_items = []
+        
+        # 상품 데이터 처리: 할인율 계산 및 필터링
+        processed_items = []
+        for item in event_items:
+            original_price = item.get('originalPrice', 0)
+            sale_price = item.get('salePrice', 0)
+            
+            # originalPrice가 0이거나 salePrice보다 낮으면 제외
+            if original_price <= 0 or original_price < sale_price:
+                continue
+            
+            # 할인율 계산
+            discount_rate = round(((original_price - sale_price) / original_price) * 100)
+            item['discountRate'] = discount_rate
+            item['originalPrice'] = original_price
+            item['salePrice'] = sale_price
+            processed_items.append(item)
+        
+        # 할인율이 높은 순으로 정렬
+        processed_items.sort(key=lambda x: x.get('discountRate', 0), reverse=True)
+        
+        if not processed_items:
+            print("❌ 처리된 기획전 상품이 없습니다.")
         
         # 카테고리별 베스트셀러 상품 조회
         category_data = {}
@@ -74,16 +121,15 @@ def main():
             items = api_handler.get_bestseller_products(category_id=category_id)
             category_data[category_name] = items
         
-        if not goldbox_items and not any(category_data.values()):
-            print("❌ 골드박스와 베스트셀러 상품을 모두 불러오지 못했습니다. API 로그를 확인하세요.")
-            # 실패해도 빈 페이지만 만들도록 스크립트를 중단하지는 않습니다.
+        if not processed_items and not any(category_data.values()):
+            print("❌ 기획전과 베스트셀러 상품을 모두 불러오지 못했습니다. API 로그를 확인하세요.")
         
         # 4. HTML 카드 생성
         print("[3/4] HTML 코드 생성 중...")
-        goldbox_html = "".join([create_product_card(item) for item in goldbox_items])
+        event_html = "".join([create_product_card(item) for item in processed_items])
         
-        if not goldbox_html:
-            goldbox_html = "<p>오늘의 골드박스 상품을 불러오는 데 실패했습니다.</p>"
+        if not event_html:
+            event_html = "<p>오늘의 기획전 상품을 불러오는 데 실패했습니다.</p>"
         
         # 카테고리별 HTML 카드 생성
         category_htmls = {}
@@ -100,10 +146,10 @@ def main():
         # 6. 메인 콘텐츠 HTML 생성
         print("[4/4] HTML 구조 생성 중...")
         main_content_html = f"""
-        <div class="goldbox-section">
-            <h2 class="section-title">✨ 골드박스 특가</h2>
+        <div class="special-event-section">
+            <h2 class="section-title">✨ 기획전 특가</h2>
             <div class="grid-container">
-                {goldbox_html}
+                {event_html}
             </div>
         </div>
 """
@@ -121,7 +167,7 @@ def main():
 """
 
         # 7. 템플릿에 데이터 치환
-        now = datetime.datetime.now().strftime("%Y년 %m월 %d일 %H시 %M분")
+        now = (datetime.utcnow() + timedelta(hours=9)).strftime("%Y년 %m월 %d일 %H시 %M분")
         output_html = template.replace("%%UPDATE_TIME%%", f"{now} 기준")
         output_html = output_html.replace("%%MAIN_CONTENT%%", main_content_html)
 
