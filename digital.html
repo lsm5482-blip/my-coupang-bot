@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가전/디지털 핫딜 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-detail-section">
+            <h2 class="section-title">가전/디지털 핫딜</h2>
+            <div class="grid-container">
+                
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1628632801&itemId=2778300334&vendorItemId=70768075171&traceid=V0-113-adc708e342945285" target="_blank" rel="noopener sponsored">
+            <img src="https://image4.coupangcdn.com/image/retail/images/312272745720457-4093476f-dfb9-470c-bc9c-ec326945099b.jpg" alt="홈플래닛 패브릭 고속충전케이블 C타입" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">홈플래닛 패브릭 고속충전케이블 C타입</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,490원</span>
+                    <span class="sale-price">3,490원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8844086248&itemId=23756832465&vendorItemId=90781295338&traceid=V0-113-565df6709344e74c" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/retail/images/1119854434934349-e777a93a-a0c2-4d57-bf66-8c9d7b7ad907.jpg" alt="브리타 정수기 필터 막스트라 프로 퓨어 퍼포먼스 3입" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">브리타 정수기 필터 막스트라 프로 퓨어 퍼포먼스 3입</div>
+                <div class="product-price-container">
+                    <span class="original-price">20,900원</span>
+                    <span class="sale-price">20,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8367073894&itemId=24175708331&vendorItemId=91193685703&traceid=V0-113-8955d242cb33fcee" target="_blank" rel="noopener sponsored">
+            <img src="https://static.coupangcdn.com/image/vendor_inventory/81d4/f1710ef0f21e8d2fdf39942bdaae12c473182d2da15b0436a973b54a6661.jpg" alt="Apple 2024 에어팟 4세대 액티브 노이즈 캔슬링 블루투스 이어폰" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">Apple 2024 에어팟 4세대 액티브 노이즈 캔슬링 블루투스 이어폰</div>
+                <div class="product-price-container">
+                    <span class="original-price">239,310원</span>
+                    <span class="sale-price">239,310원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7415163807&itemId=19222022188&vendorItemId=86338760049&traceid=V0-113-693c11efc2bbce39" target="_blank" rel="noopener sponsored">
+            <img src="https://img5a.coupangcdn.com/image/retail/images/11932041733418-2d422f73-d65a-4fd6-9346-67f88b350a6b.jpg" alt="신지모루 오피디 25W GaN 듀얼포트 PPS 초고속 PD 충전기" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">신지모루 오피디 25W GaN 듀얼포트 PPS 초고속 PD 충전기</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,900원</span>
+                    <span class="sale-price">8,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7063727460&itemId=18557384353&vendorItemId=85695113559&traceid=V0-113-2fa56664524142b8" target="_blank" rel="noopener sponsored">
+            <img src="https://image6.coupangcdn.com/image/1025_amir_coupang_oct_80k/616a/90d1ed5929f36819f667780434fb54ad791ead45f756567cb9eb99db9078.jpg" alt="에코파워탭 LED 스위치 개별 절전형 멀티탭 3구 EPM 203N" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">에코파워탭 LED 스위치 개별 절전형 멀티탭 3구 EPM 203N</div>
+                <div class="product-price-container">
+                    <span class="original-price">9,500원</span>
+                    <span class="sale-price">9,500원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8803472212&itemId=25636725400&vendorItemId=92626790654&traceid=V0-113-4e0e1cdf04169745" target="_blank" rel="noopener sponsored">
+            <img src="https://image8.coupangcdn.com/image/retail/images/1185484732024517-f2792875-d5b9-46bc-bc3f-9899ec568ce6.jpg" alt="아이리버 C타입-C타입 패브릭 초고속 충전 데이터 케이블 60W" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">아이리버 C타입-C타입 패브릭 초고속 충전 데이터 케이블 60W</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,100원</span>
+                    <span class="sale-price">3,100원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8192535363&itemId=23451383734&vendorItemId=90478144994&traceid=V0-113-fd4497c12f1e8e36" target="_blank" rel="noopener sponsored">
+            <img src="https://img5a.coupangcdn.com/image/retail/images/2024/06/27/14/6/8703a61d-2a84-4f7b-9123-8105b79a7391.png" alt="굿밸류 디스플레이 C타입-C타입 PD 100W 초고속 충전케이블" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">굿밸류 디스플레이 C타입-C타입 PD 100W 초고속 충전케이블</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,200원</span>
+                    <span class="sale-price">4,200원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9126340912&itemId=20613214777&vendorItemId=87687568773&traceid=V0-113-4ed0056033db8b28" target="_blank" rel="noopener sponsored">
+            <img src="https://image8.coupangcdn.com/image/vendor_inventory/d50b/a27301908d7cfc01454303a51a6880f316f5918121569077456933f481cc.jpg" alt="삼성전자 PD PPS GaN C타입 초고속 충전기 25W" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">삼성전자 PD PPS GaN C타입 초고속 충전기 25W</div>
+                <div class="product-price-container">
+                    <span class="original-price">13,400원</span>
+                    <span class="sale-price">13,400원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=5309101612&itemId=25550030132&vendorItemId=74945175732&traceid=V0-113-09bac7b5f3f4541f" target="_blank" rel="noopener sponsored">
+            <img src="https://static.coupangcdn.com/image/retail/images/175501480103361-28df5f6d-119e-49fd-8686-02a848892510.jpg" alt="플레이고 USB 메모리 P50" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">플레이고 USB 메모리 P50</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,600원</span>
+                    <span class="sale-price">4,600원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7292970817&itemId=18630655098&vendorItemId=85765955482&traceid=V0-113-ff802679f18e3509" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/retail/images/1077799097869801-4f30fd7b-2c3c-4818-b434-6d4c7a8223e6.jpg" alt="에코파워탭 T자 멀티탭 3구 EPM-403T" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">에코파워탭 T자 멀티탭 3구 EPM-403T</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,200원</span>
+                    <span class="sale-price">3,200원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1796918840&itemId=3057049578&vendorItemId=3466219990&traceid=V0-113-dbeb72b25164ca2a" target="_blank" rel="noopener sponsored">
+            <img src="https://img2a.coupangcdn.com/image/retail/images/492991105074972-4a1d435b-b30b-4282-9d76-aaf033d90cb6.jpg" alt="로지텍 무선마우스 M170" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">로지텍 무선마우스 M170</div>
+                <div class="product-price-container">
+                    <span class="original-price">12,900원</span>
+                    <span class="sale-price">12,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=310080038&itemId=977484067&vendorItemId=5392665218&traceid=V0-113-c73a6d2a7fbf4b52" target="_blank" rel="noopener sponsored">
+            <img src="https://img1c.coupangcdn.com/image/retail/images/1055979437804-e0f401c0-510a-4275-bcc1-50b41e7c039c.jpg" alt="홈플래닛 핸디형 스탠드 스팀다리미" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">홈플래닛 핸디형 스탠드 스팀다리미</div>
+                <div class="product-price-container">
+                    <span class="original-price">25,990원</span>
+                    <span class="sale-price">25,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8252092815&itemId=23759177382&vendorItemId=93417599184&traceid=V0-113-ec1ec1775b2771a1" target="_blank" rel="noopener sponsored">
+            <img src="https://img1c.coupangcdn.com/image/vendor_inventory/c0d9/24c628cc593b8532b7b59792e6bb1ac8a7369292dc41fd1f033f20a3b5d6.jpg" alt="YINTO c타입 고속 충전기 25W PD3.0 PPS + C TO C 1.5M 100w 케이블 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">YINTO c타입 고속 충전기 25W PD3.0 PPS + C TO C 1.5M 100w 케이블 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">9,800원</span>
+                    <span class="sale-price">9,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=141088383&itemId=17321560995&vendorItemId=4007596558&traceid=V0-113-2bc1427d78188032" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/1025_amir_coupang_oct_80k/b1e6/6ecc413d317f846d8ca4dad67fe15af59599434a50325e84411406cf44ef.jpg" alt="신지모루 USB-C 타입 더치 패브릭 케이블" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">신지모루 USB-C 타입 더치 패브릭 케이블</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,630원</span>
+                    <span class="sale-price">5,630원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8906902087&itemId=26014315055&vendorItemId=3051062251&traceid=V0-113-6a8ce26059f496af" target="_blank" rel="noopener sponsored">
+            <img src="https://image9.coupangcdn.com/image/retail/images/74994448192496-257f7f45-1864-451f-b9e7-a45fe5b238b4.jpg" alt="하이플러스 자동충전 하이패스카드 베이직" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">하이플러스 자동충전 하이패스카드 베이직</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,000원</span>
+                    <span class="sale-price">6,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=2068932759&itemId=3515436045&vendorItemId=71501561558&traceid=V0-113-4e57f5c60cc75e80" target="_blank" rel="noopener sponsored">
+            <img src="https://image14.coupangcdn.com/image/retail/images/1741877828579565-2c18e141-f9ed-4c88-b3b7-9e215a28bb89.jpg" alt="필립스 3000 시리즈 전기포트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">필립스 3000 시리즈 전기포트</div>
+                <div class="product-price-container">
+                    <span class="original-price">24,300원</span>
+                    <span class="sale-price">24,300원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6279867416&itemId=12889406958&vendorItemId=80154499035&traceid=V0-113-5391715543fe73ee" target="_blank" rel="noopener sponsored">
+            <img src="https://image9.coupangcdn.com/image/retail/images/179603274139682-4c48aeaf-0dd8-4b85-9263-2ae65400c938.jpg" alt="에이치디탑 USB 1포트 충전기 HT-5V01" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">에이치디탑 USB 1포트 충전기 HT-5V01</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,020원</span>
+                    <span class="sale-price">3,020원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=5268128572&itemId=7525738266&vendorItemId=74812944133&traceid=V0-113-d38db4a4d83b73d7" target="_blank" rel="noopener sponsored">
+            <img src="https://image5.coupangcdn.com/image/retail/images/1116976265164123-611e5d2f-ddee-4197-af5a-97d17fbff888.jpg" alt="코드웨이 HDMI 2.1v UHD 8K 케이블" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코드웨이 HDMI 2.1v UHD 8K 케이블</div>
+                <div class="product-price-container">
+                    <span class="original-price">9,800원</span>
+                    <span class="sale-price">9,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8994002212&itemId=26348869501&vendorItemId=93466818611&traceid=V0-113-d0a6b5508b0fd980" target="_blank" rel="noopener sponsored">
+            <img src="https://image5.coupangcdn.com/image/vendor_inventory/308c/15c2339274eec01c661826709fa8f6d686e02661194cdfd91592a0c6d8ae.jpg" alt="SUNGOD 미니 가습기 듀얼미스트 500ml 무소음 무선 무드등 가정용 차량용 사무실 탁상용" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">SUNGOD 미니 가습기 듀얼미스트 500ml 무소음 무선 무드등 가정용 차량용 사무실 탁상용</div>
+                <div class="product-price-container">
+                    <span class="original-price">18,800원</span>
+                    <span class="sale-price">18,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        <span class="badge-all-time-low">🔥 역대 최저가!</span>
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8371426122&itemId=24191037916&vendorItemId=93060581945&traceid=V0-113-a4c449bdaf9cc908" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/retail/images/8768708414732-dbb521eb-63cb-4fbc-8e19-9f93f5ac917d.jpg" alt="알리사 숲속안개 미니 초음파 사무용 무선 탁상용 충전식 가습기 700ml + 필터 4p 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">알리사 숲속안개 미니 초음파 사무용 무선 탁상용 충전식 가습기 700ml + 필터 4p 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">25,130원</span>
+                    <span class="sale-price">25,130원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>

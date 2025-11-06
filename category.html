@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카테고리 전체보기 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-hub-section">
+            <h2 class="section-title">전체 카테고리</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                <a href="digital.html" class="category-link">가전/디지털</a>
+        <a href="health.html" class="category-link">헬스/건강식품</a>
+        <a href="womens-fashion.html" class="category-link">여성패션</a>
+        <a href="mens-fashion.html" class="category-link">남성패션</a>
+        <a href="beauty.html" class="category-link">화장품</a>
+        <a href="sports.html" class="category-link">스포츠</a>
+        <a href="toys.html" class="category-link">완구</a>
+        <a href="baby.html" class="category-link">출산/유아동</a>
+        <a href="plants.html" class="category-link">식물</a>
+        <a href="automotive.html" class="category-link">자동차</a>
+        <a href="others.html" class="category-link">기타</a>
+        
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>

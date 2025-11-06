@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자동차 핫딜 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-detail-section">
+            <h2 class="section-title">자동차 핫딜</h2>
+            <div class="grid-container">
+                
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6528172171&itemId=5911958170&vendorItemId=73210037048&traceid=V0-113-ea3e109dddeaf065" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/4063320789843989-2f070b18-3886-4b8c-871b-2403227cfec9.jpg" alt="흙대파" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">흙대파</div>
+                <div class="product-price-container">
+                    <span class="original-price">2,240원</span>
+                    <span class="sale-price">2,240원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1271064981&itemId=2275730724&vendorItemId=70272921582&traceid=V0-113-5e7ea65e5d0510be" target="_blank" rel="noopener sponsored">
+            <img src="https://img1c.coupangcdn.com/image/retail/images/2215512493945149-f801fa53-33fd-482b-abcf-20dda5817093.jpg" alt="곰곰 무항생제 신선한 대란" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">곰곰 무항생제 신선한 대란</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,580원</span>
+                    <span class="sale-price">8,580원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4842938988&itemId=6261001344&vendorItemId=73556670010&traceid=V0-113-325498fc41a35b3d" target="_blank" rel="noopener sponsored">
+            <img src="https://img1a.coupangcdn.com/image/retail/images/110105750838087-30e2fb29-2d8b-4529-80ff-db7665fed6a4.jpg" alt="무항생제 신선한 대란" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">무항생제 신선한 대란</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,390원</span>
+                    <span class="sale-price">8,390원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7548941405&itemId=19861765205&vendorItemId=86962702565&traceid=V0-113-dc2bef9c7b7d5f43" target="_blank" rel="noopener sponsored">
+            <img src="https://image15.coupangcdn.com/image/retail/images/1245521295790002-ba376a2f-873c-467a-937e-2d49dbbb8273.jpg" alt="[로켓프레시] 국내산 깐마늘" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">[로켓프레시] 국내산 깐마늘</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,460원</span>
+                    <span class="sale-price">1,460원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6201953316&itemId=6106220628&vendorItemId=73402571318&traceid=V0-113-bbf565437496d4e6" target="_blank" rel="noopener sponsored">
+            <img src="https://image14.coupangcdn.com/image/retail/images/4277012004459-c7710d73-f1c9-4fe3-bb5d-a9ca72f84383.jpg" alt="국내산 청양고추" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 청양고추</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,180원</span>
+                    <span class="sale-price">1,180원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=130180913&itemId=383114455&vendorItemId=3930090438&traceid=V0-113-002ede55d7ff1171" target="_blank" rel="noopener sponsored">
+            <img src="https://img5a.coupangcdn.com/image/retail/images/31538432386165-74a6c0f0-448c-480f-9c9e-bf3db0c4dc3f.jpg" alt="서울우유 1급A우유" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">서울우유 1급A우유</div>
+                <div class="product-price-container">
+                    <span class="original-price">7,580원</span>
+                    <span class="sale-price">7,580원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4874444452&itemId=6339533155&vendorItemId=73634892675&traceid=V0-113-ca1102b6f942aa11" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/84438627163531-704bd851-3a88-4969-b0be-8c37a6f040b8.jpg" alt="국내산 브로콜리" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 브로콜리</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,980원</span>
+                    <span class="sale-price">3,980원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1275124832&itemId=2281054168&vendorItemId=70278175584&traceid=V0-113-ce2ea187b7556c63" target="_blank" rel="noopener sponsored">
+            <img src="https://image8.coupangcdn.com/image/retail/images/1052513687379823-df863522-e52c-4f82-8cc7-7a6af214e231.jpg" alt="곰곰 아삭한 콩나물" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">곰곰 아삭한 콩나물</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,000원</span>
+                    <span class="sale-price">1,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7748460732&itemId=21053182469&vendorItemId=88115663473&traceid=V0-113-7e198e339e07fd89" target="_blank" rel="noopener sponsored">
+            <img src="https://img1a.coupangcdn.com/image/retail/images/1343362878923216-460e6d04-61e9-405e-9f08-4c7e80dcdacf.png" alt="[로켓프레시] 서울우유 나 100% 우유" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">[로켓프레시] 서울우유 나 100% 우유</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,840원</span>
+                    <span class="sale-price">5,840원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=5186098054&itemId=19860509234&vendorItemId=86961475229&traceid=V0-113-f6f637684d0bbec9" target="_blank" rel="noopener sponsored">
+            <img src="https://image3.coupangcdn.com/image/retail/images/772868379108268-d27cf929-adec-43b4-b2fb-004667e775b7.jpg" alt="국내산 청경채" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 청경채</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,500원</span>
+                    <span class="sale-price">1,500원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=2233944921&itemId=3812412916&vendorItemId=71797311480&traceid=V0-113-c6e3f57a4f6a376e" target="_blank" rel="noopener sponsored">
+            <img src="https://image12.coupangcdn.com/image/retail/images/9856170078961-6e88a020-4a03-4e15-8edf-64d61eaf82d1.jpg" alt="국내산 백오이" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 백오이</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,080원</span>
+                    <span class="sale-price">4,080원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6258890122&itemId=12731571135&vendorItemId=79998120417&traceid=V0-113-141283c2d77077cc" target="_blank" rel="noopener sponsored">
+            <img src="https://img3a.coupangcdn.com/image/retail/images/7532952550087039-f9e2e389-cf67-4441-b445-cf29f2cfab13.jpg" alt="국내산 양배추 1/2통" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 양배추 1/2통</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,840원</span>
+                    <span class="sale-price">1,840원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7784292756&itemId=2226804174&vendorItemId=70224444586&traceid=V0-113-9beb131760f5460c" target="_blank" rel="noopener sponsored">
+            <img src="https://image11.coupangcdn.com/image/retail/images/234395992657017-4f140592-a4eb-4cbb-86ea-3c03c790a2c8.jpg" alt="곰곰 신선한 1A 우유" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">곰곰 신선한 1A 우유</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,780원</span>
+                    <span class="sale-price">4,780원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7614436434&itemId=20174033794&vendorItemId=87266101083&traceid=V0-113-fe53098f2647f708" target="_blank" rel="noopener sponsored">
+            <img src="https://image9.coupangcdn.com/image/retail/images/365228343309193-a8ba0ced-f009-4306-902c-5745a4f92b84.jpg" alt="[로켓프레시] 풀무원 소가 찌개두부" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">[로켓프레시] 풀무원 소가 찌개두부</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,420원</span>
+                    <span class="sale-price">1,420원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7869554357&itemId=20151857085&vendorItemId=86493936096&traceid=V0-113-17c2a755e3c9640f" target="_blank" rel="noopener sponsored">
+            <img src="https://img3c.coupangcdn.com/image/retail/images/870299699394286-75b7c4c6-c0d6-4368-adcc-3ecb30b72597.jpg" alt="동원샘물 무라벨" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">동원샘물 무라벨</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,870원</span>
+                    <span class="sale-price">6,870원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6525861606&itemId=13505288432&vendorItemId=80759387680&traceid=V0-113-e38070a413d77177" target="_blank" rel="noopener sponsored">
+            <img src="https://img2c.coupangcdn.com/image/retail/images/29400661142120-ead107fa-4ecf-49de-8351-dce264a21edb.jpg" alt="국내산 시금치" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 시금치</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,130원</span>
+                    <span class="sale-price">5,130원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=2233944921&itemId=5617626770&vendorItemId=72916817045&traceid=V0-113-c6e3f57a4f6a376e" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/retail/images/6535352251288574-8117bce5-48fe-4c48-bc43-acb56556ea01.jpg" alt="국내산 백오이" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 백오이</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,980원</span>
+                    <span class="sale-price">5,980원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8985301638&itemId=26313342872&vendorItemId=3930090500&traceid=V0-113-567c3a4e41216bd1" target="_blank" rel="noopener sponsored">
+            <img src="https://image14.coupangcdn.com/image/retail/images/247312445331164-4e48dd58-dce9-4a99-9907-273121e05211.jpg" alt="서울우유" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">서울우유</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,970원</span>
+                    <span class="sale-price">5,970원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6202348727&itemId=14419909823&vendorItemId=81663775739&traceid=V0-113-d34efd69434c7b1f" target="_blank" rel="noopener sponsored">
+            <img src="https://image3.coupangcdn.com/image/retail/images/6332660849526376-a951ecdf-92d5-4051-ac71-f3f05c40572f.jpg" alt="국내산 깐마늘" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 깐마늘</div>
+                <div class="product-price-container">
+                    <span class="original-price">3,420원</span>
+                    <span class="sale-price">3,420원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4792356812&itemId=6142183499&vendorItemId=73438425731&traceid=V0-113-66ef43f39504f2d7" target="_blank" rel="noopener sponsored">
+            <img src="https://img3c.coupangcdn.com/image/retail/images/13399308760286-80025ebd-bbd7-45ad-af2f-8f79d3dd18db.jpg" alt="국내산 파프리카" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">국내산 파프리카</div>
+                <div class="product-price-container">
+                    <span class="original-price">2,980원</span>
+                    <span class="sale-price">2,980원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>

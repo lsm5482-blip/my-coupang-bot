@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>화장품 핫딜 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-detail-section">
+            <h2 class="section-title">화장품 핫딜</h2>
+            <div class="grid-container">
+                
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9643335&itemId=42590349&vendorItemId=3066110810&traceid=V0-113-eea98add4b78ec41" target="_blank" rel="noopener sponsored">
+            <img src="https://image11.coupangcdn.com/image/vendor_inventory/5884/9c292ae4d847365db85e5a2565bc0e859d7354a5f83a730ef9fd0f081d24.jpg" alt="아바드 캐릭터 코튼 가제손수건 K형 20개입 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">아바드 캐릭터 코튼 가제손수건 K형 20개입 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">10,300원</span>
+                    <span class="sale-price">10,300원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=330539939&itemId=1056373749&vendorItemId=5529358003&traceid=V0-113-85d09c949ee34a5d" target="_blank" rel="noopener sponsored">
+            <img src="https://image1.coupangcdn.com/image/vendor_inventory/fcf5/d20628adc70db78850d7373765b1ab928ba59de138da0e1c6cf1717144e1.jpg" alt="오가닉붐 유기농 직사각형 조리원 사계절 속싸보" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">오가닉붐 유기농 직사각형 조리원 사계절 속싸보</div>
+                <div class="product-price-container">
+                    <span class="original-price">12,020원</span>
+                    <span class="sale-price">12,020원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=21901297&itemId=85392333&vendorItemId=3145072096&traceid=V0-113-9e192cc0bc891341" target="_blank" rel="noopener sponsored">
+            <img src="https://image13.coupangcdn.com/image/product/image/vendoritem/2018/07/30/3145072096/0b4b47dd-a59a-48b0-a692-3dc2b9bc3c79.jpg" alt="피셔프라이스 손싸개 3p" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">피셔프라이스 손싸개 3p</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,440원</span>
+                    <span class="sale-price">5,440원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9096269810&itemId=26737223686&vendorItemId=93708549002&traceid=V0-113-59a9dae20a9d4452" target="_blank" rel="noopener sponsored">
+            <img src="https://image1.coupangcdn.com/image/vendor_inventory/801e/3a685c237f5143a366cd890063c758c0536d915066aa7a3ae49571bf57b8.jpg" alt="리틀그립 스와들 기적의 속싸개 그레이화이트 2종 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">리틀그립 스와들 기적의 속싸개 그레이화이트 2종 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">17,980원</span>
+                    <span class="sale-price">17,980원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8279464368&itemId=7099348115&vendorItemId=74391284162&traceid=V0-113-6dd724098598e906" target="_blank" rel="noopener sponsored">
+            <img src="https://img1a.coupangcdn.com/image/retail/images/326866681462197-8ca68898-b411-4466-be6d-695939c8de02.jpg" alt="엘라바 무소음 스와들 스트랩 면메쉬 S" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">엘라바 무소음 스와들 스트랩 면메쉬 S</div>
+                <div class="product-price-container">
+                    <span class="original-price">23,000원</span>
+                    <span class="sale-price">23,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=313510314&itemId=991420074&vendorItemId=5417199165&traceid=V0-113-6f0794d1b458fa57" target="_blank" rel="noopener sponsored">
+            <img src="https://img4c.coupangcdn.com/image/vendor_inventory/bb8c/9aa0064bd4d835adea2348a88779ce3cf69b505cf09b7213a03965f6be43.jpg" alt="꿈꾸는두부 남아용 삼중거즈 스카프빕 3종세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">꿈꾸는두부 남아용 삼중거즈 스카프빕 3종세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,490원</span>
+                    <span class="sale-price">11,490원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8769325503&itemId=25505836783&vendorItemId=92497882471&traceid=V0-113-34ce0407a0db6ffb" target="_blank" rel="noopener sponsored">
+            <img src="https://static.coupangcdn.com/image/vendor_inventory/image_audit/stage/manual/e3827039e08ea758c4db9461c0a471442d97e3beaf75cf2d428e41f67332_1762415210100.jpg" alt="KC인증 몽실이 6겹 순면 요일턱받이 아기 신생아 이유식 여름 돌 선물 세트 선물포장" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">KC인증 몽실이 6겹 순면 요일턱받이 아기 신생아 이유식 여름 돌 선물 세트 선물포장</div>
+                <div class="product-price-container">
+                    <span class="original-price">19,900원</span>
+                    <span class="sale-price">19,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1045012&itemId=4434439&vendorItemId=3005387030&traceid=V0-113-ac80a0ef1e7b6b85" target="_blank" rel="noopener sponsored">
+            <img src="https://img2c.coupangcdn.com/image/vendor_inventory/2301/8b6eb732d4e65e3f3a9a6765f8531443422da5262ac9077f6ba965d95d9e.jpg" alt="오가닉붐 베이직 곰돌이모(사계절)" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">오가닉붐 베이직 곰돌이모(사계절)</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,760원</span>
+                    <span class="sale-price">5,760원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8971392377&itemId=26257527505&vendorItemId=93292409154&traceid=V0-113-09e535ddd60da742" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/vendor_inventory/fcfa/7b7954ea79af3d2eda4e04d16f8761fc6035656a0948e60076635e104e1b.jpg" alt="미소 유아 고급 순면 거즈 손수건 15장 세트 국내 제품" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">미소 유아 고급 순면 거즈 손수건 15장 세트 국내 제품</div>
+                <div class="product-price-container">
+                    <span class="original-price">13,900원</span>
+                    <span class="sale-price">13,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4316044786&itemId=5015522700&vendorItemId=90835397286&traceid=V0-113-e0fbd87b6cc5f033" target="_blank" rel="noopener sponsored">
+            <img src="https://img4c.coupangcdn.com/image/vendor_inventory/e021/544d2daf726719a7e34952e5afdbf8f13d2375aedb271a4db93e7c438b8c.jpg" alt="쁘리엘르 허밍 순면 누비 아기 겉싸개" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">쁘리엘르 허밍 순면 누비 아기 겉싸개</div>
+                <div class="product-price-container">
+                    <span class="original-price">178,280원</span>
+                    <span class="sale-price">178,280원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8561238501&itemId=24793093769&vendorItemId=91800907642&traceid=V0-113-37c8cbef07505fa2" target="_blank" rel="noopener sponsored">
+            <img src="https://image11.coupangcdn.com/image/retail/images/65471940168814-e45f1017-eab1-4623-86a0-7b5db1146f66.jpg" alt="점핑칙피 유아용 롱 골지 양말 6종 + 선물 패키지 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">점핑칙피 유아용 롱 골지 양말 6종 + 선물 패키지 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">10,900원</span>
+                    <span class="sale-price">10,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8620366152&itemId=25009278414&vendorItemId=92515265399&traceid=V0-113-6236fc2adf84582b" target="_blank" rel="noopener sponsored">
+            <img src="https://img1c.coupangcdn.com/image/vendor_inventory/09db/9ecb449f5b6173ae0865e1d072d239ec37baa789a55523ed2cbc8601ab46.jpg" alt="하방방 신생아 아기 곰돌이 외출복 바디슈트 우주복 출산준비물" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">하방방 신생아 아기 곰돌이 외출복 바디슈트 우주복 출산준비물</div>
+                <div class="product-price-container">
+                    <span class="original-price">33,500원</span>
+                    <span class="sale-price">33,500원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8561238544&itemId=24793093873&vendorItemId=91800907736&traceid=V0-113-efdfe14ce6340488" target="_blank" rel="noopener sponsored">
+            <img src="https://image8.coupangcdn.com/image/retail/images/639223679432-d10da062-d2cf-43c5-99f0-137735ca79f3.jpg" alt="점핑칙피 유아용 심플 골지 양말 6켤레 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">점핑칙피 유아용 심플 골지 양말 6켤레 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,990원</span>
+                    <span class="sale-price">6,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9049836754&itemId=26560276152&vendorItemId=93533990804&traceid=V0-113-01d4f798fce46d7f" target="_blank" rel="noopener sponsored">
+            <img src="https://image3.coupangcdn.com/image/vendor_inventory/0af9/0e761af484c3e6d48f311e93ad818d25ee77e59ed306533aaf40bf627318.png" alt="25FW신제품 밍크뮤 뮤뮤 배냇저고리 손싸개 신생아 출산선물세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">25FW신제품 밍크뮤 뮤뮤 배냇저고리 손싸개 신생아 출산선물세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">51,000원</span>
+                    <span class="sale-price">51,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9088442980&itemId=26705746196&vendorItemId=93677537458&traceid=V0-113-db840ca12e9d2d56" target="_blank" rel="noopener sponsored">
+            <img src="https://img4a.coupangcdn.com/image/vendor_inventory/af69/301c9a488a730df3fd873431ca1376ccdb8b944f32936ecfaafe3ab4fa19.jpg" alt="감성팩토리 삼각 순면 투버튼 턱받이 8종" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">감성팩토리 삼각 순면 투버튼 턱받이 8종</div>
+                <div class="product-price-container">
+                    <span class="original-price">13,000원</span>
+                    <span class="sale-price">13,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=21901316&itemId=85392332&vendorItemId=3145072087&traceid=V0-113-0f010c0bdffccb26" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/retail/images/554671150405839-acba49f3-7e3b-499f-b82c-a9baa9855350.jpg" alt="피셔프라이스 면 손싸개 3개 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">피셔프라이스 면 손싸개 3개 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,440원</span>
+                    <span class="sale-price">5,440원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8936689151&itemId=26129537709&vendorItemId=93109820452&traceid=V0-113-ed7da05a7ed9a828" target="_blank" rel="noopener sponsored">
+            <img src="https://img2a.coupangcdn.com/image/retail/images/2025/07/22/17/0/766af06f-76ee-4bb3-b154-9a438b32044e.jpg" alt="코니 유아용 모달 배앓이방지 레깅스 2종 세트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코니 유아용 모달 배앓이방지 레깅스 2종 세트</div>
+                <div class="product-price-container">
+                    <span class="original-price">30,800원</span>
+                    <span class="sale-price">30,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9105437782&itemId=26770586344&vendorItemId=73621700399&traceid=V0-113-b5e5f9bfe049b9af" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/vendor_inventory/dc55/217a5abeb9022d1143dd114b67471c0b96d922a5ad5d154169240b886323.jpg" alt="그린베베 영유아 겨울용 꼬깔 보온조끼" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">그린베베 영유아 겨울용 꼬깔 보온조끼</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,820원</span>
+                    <span class="sale-price">8,820원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8891290308&itemId=25956272843&vendorItemId=92939073414&traceid=V0-113-4d69d427d07e5f6c" target="_blank" rel="noopener sponsored">
+            <img src="https://image4.coupangcdn.com/image/retail/images/1380495003218915-041e5d0e-a19e-4fe2-8406-71007cdd0eb7.jpg" alt="점핑칙피 유아동 베이직 긴팔 솔리드 티셔츠" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">점핑칙피 유아동 베이직 긴팔 솔리드 티셔츠</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,590원</span>
+                    <span class="sale-price">5,590원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9003301234&itemId=26383793792&vendorItemId=4980633328&traceid=V0-113-4e78200231a203f4" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/retail/images/598261382165451-f6080510-cf0e-4768-ac94-439cc3659655.jpg" alt="말랑하니 스와들 속싸개 메쉬 M" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">말랑하니 스와들 속싸개 메쉬 M</div>
+                <div class="product-price-container">
+                    <span class="original-price">25,900원</span>
+                    <span class="sale-price">25,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기타 핫딜 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-detail-section">
+            <h2 class="section-title">기타 핫딜</h2>
+            <div class="grid-container">
+                
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=169280610&itemId=484461411&vendorItemId=4220116848&traceid=V0-113-4ae8b097aa58b84c" target="_blank" rel="noopener sponsored">
+            <img src="https://image9.coupangcdn.com/image/retail/images/220355938993817-426c516f-3322-47fd-ae69-25eb5ee783db.jpg" alt="코멧 깨끗한 천연펄프 키친타월" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 깨끗한 천연펄프 키친타월</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,590원</span>
+                    <span class="sale-price">6,590원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9055230703&itemId=26580293242&vendorItemId=93553714655&traceid=V0-113-67eb8b5a2831964c" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/vendor_inventory/c815/52b21d2f0b1d4fcfecfe3eedaa33b1dd5f7d21f1125330caa0aa6d8e77c3.jpg" alt="스파클 종이컵 185ml" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">스파클 종이컵 185ml</div>
+                <div class="product-price-container">
+                    <span class="original-price">9,990원</span>
+                    <span class="sale-price">9,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7572829529&itemId=19975045055&vendorItemId=90271557299&traceid=V0-113-7700177b7e1384f1" target="_blank" rel="noopener sponsored">
+            <img src="https://image14.coupangcdn.com/image/vendor_inventory/3bb7/69d508847d33b7f1d606a660b44986441c9f737c93a2c4a23033e1a817ad.png" alt="모나리자 스마트 다용도 키친타올 250매" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">모나리자 스마트 다용도 키친타올 250매</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,860원</span>
+                    <span class="sale-price">11,860원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7660554607&itemId=24566083969&vendorItemId=3000140916&traceid=V0-113-5e26579bbfb2861f" target="_blank" rel="noopener sponsored">
+            <img src="https://static.coupangcdn.com/image/vendor_inventory/a95d/7f701514bb4ded3eb0e7816dec9fb89f006b8352db0e53bcfcb1c56e6383.jpg" alt="깨끗한나라 데일리 천연펄프 키친타월" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">깨끗한나라 데일리 천연펄프 키친타월</div>
+                <div class="product-price-container">
+                    <span class="original-price">7,490원</span>
+                    <span class="sale-price">7,490원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7852115435&itemId=21404472211&vendorItemId=4226718248&traceid=V0-113-ea0be9df20a6cca5" target="_blank" rel="noopener sponsored">
+            <img src="https://img3a.coupangcdn.com/image/1025_amir_coupang_oct_80k/2671/5a372705a64e09b63f9811e855d442f3d3558a668e7d49129ec7eda472d5.jpg" alt="코멧 도톰한 엠보싱 위생장갑 500매" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 도톰한 엠보싱 위생장갑 500매</div>
+                <div class="product-price-container">
+                    <span class="original-price">7,990원</span>
+                    <span class="sale-price">7,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1277818179&itemId=2284867988&vendorItemId=70281957542&traceid=V0-113-f407488f3ee2ff72" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/1420582270208762-2eeeee0f-f86a-4ca5-834d-5343bd1cadd5.jpg" alt="탐사 고평량 종이컵 무인쇄 380ml" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">탐사 고평량 종이컵 무인쇄 380ml</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,190원</span>
+                    <span class="sale-price">6,190원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8844086248&itemId=23756832465&vendorItemId=90781295338&traceid=V0-113-565df6709344e74c" target="_blank" rel="noopener sponsored">
+            <img src="https://image11.coupangcdn.com/image/retail/images/1119854434934349-e777a93a-a0c2-4d57-bf66-8c9d7b7ad907.jpg" alt="브리타 정수기 필터 막스트라 프로 퓨어 퍼포먼스 3입" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">브리타 정수기 필터 막스트라 프로 퓨어 퍼포먼스 3입</div>
+                <div class="product-price-container">
+                    <span class="original-price">20,900원</span>
+                    <span class="sale-price">20,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1541104559&itemId=2249520008&vendorItemId=70246910450&traceid=V0-113-b1d4661f7e1becc5" target="_blank" rel="noopener sponsored">
+            <img src="https://img4c.coupangcdn.com/image/retail/images/18729388757488-1b49d1fe-0678-4996-83e9-e9724f137255.jpg" alt="홈플래닛 스테인레스 디지털 백라이팅 주방저울 1kg" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">홈플래닛 스테인레스 디지털 백라이팅 주방저울 1kg</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,890원</span>
+                    <span class="sale-price">6,890원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1277818179&itemId=14209966873&vendorItemId=81455435703&traceid=V0-113-f407488f3ee2ff72" target="_blank" rel="noopener sponsored">
+            <img src="https://img2c.coupangcdn.com/image/retail/images/348805300959181-34dbbdb0-1629-4dbf-ae2d-63df360af0e7.jpg" alt="탐사 고평량 종이컵 무인쇄 380ml" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">탐사 고평량 종이컵 무인쇄 380ml</div>
+                <div class="product-price-container">
+                    <span class="original-price">16,990원</span>
+                    <span class="sale-price">16,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=5853927999&itemId=19850125819&vendorItemId=86951342583&traceid=V0-113-e5903db4eb3bb2f8" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/retail/images/206475511173381-7fa14d19-072b-4732-b7fb-9b73f320e266.png" alt="마미손 플라워 고무장갑" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">마미손 플라워 고무장갑</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,680원</span>
+                    <span class="sale-price">5,680원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7871935374&itemId=26240251921&vendorItemId=88560434953&traceid=V0-113-0750aa43d1c37d6b" target="_blank" rel="noopener sponsored">
+            <img src="https://static.coupangcdn.com/image/retail/images/478766476271349-a6f21d68-c273-4fcf-a196-d14b1ea1f9bf.png" alt="크린랲 플러스 크린장갑" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">크린랲 플러스 크린장갑</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,890원</span>
+                    <span class="sale-price">6,890원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6885129342&itemId=19801267760&vendorItemId=83699353563&traceid=V0-113-a5b9a7f77822d981" target="_blank" rel="noopener sponsored">
+            <img src="https://img1a.coupangcdn.com/image/retail/images/1849934217763229-e5e0a768-b484-400d-b79d-3c2dfc07ed12.png" alt="크리넥스 빨아쓰는 위생행주 블루" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">크리넥스 빨아쓰는 위생행주 블루</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,830원</span>
+                    <span class="sale-price">11,830원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8776336005&itemId=25532846745&vendorItemId=92524527912&traceid=V0-113-3877c304bcd370c2" target="_blank" rel="noopener sponsored">
+            <img src="https://img4a.coupangcdn.com/image/retail/images/162134613207631-4f59c2bf-7bc4-4121-9893-3bf8d9e31b7d.jpg" alt="코멧 위생롤백 25 x 35 cm" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 위생롤백 25 x 35 cm</div>
+                <div class="product-price-container">
+                    <span class="original-price">2,540원</span>
+                    <span class="sale-price">2,540원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7180954892&itemId=18110930039&vendorItemId=85262568632&traceid=V0-113-49983ba685e4f3d4" target="_blank" rel="noopener sponsored">
+            <img src="https://img2a.coupangcdn.com/image/1025_amir_coupang_oct_80k/3933/4624eb8ab8982b6dc80a53818e7e0957ff930170212235b00a5beb4ff49b.jpg" alt="코멧 양면 무흠집 버블 스펀지 수세미 핑크" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 양면 무흠집 버블 스펀지 수세미 핑크</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,390원</span>
+                    <span class="sale-price">4,390원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8188344094&itemId=23423489209&vendorItemId=90450508967&traceid=V0-113-4234e734fb08825b" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/1025_amir_coupang_oct_80k/2518/6b485c21e4745a8368b1285355d2adaec8364b28c2a43666fd8985375737.jpg" alt="브론디 플러스 천연펄프 키친타월" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">브론디 플러스 천연펄프 키친타월</div>
+                <div class="product-price-container">
+                    <span class="original-price">6,870원</span>
+                    <span class="sale-price">6,870원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8049299057&itemId=22568616421&vendorItemId=89610481956&traceid=V0-113-c39ce78979c25379" target="_blank" rel="noopener sponsored">
+            <img src="https://image3.coupangcdn.com/image/1025_amir_coupang_oct_80k/7dfc/1dc387fb0f9b14ccd951d2aa3d90517532a12b89a12890a7d5cd22a0c872.jpg" alt="코멧 다용도 실속 키친타월" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 다용도 실속 키친타월</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,990원</span>
+                    <span class="sale-price">11,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7744258088&itemId=20843306138&vendorItemId=87910949727&traceid=V0-113-7703c953f137906b" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/vendor_inventory/37b1/b5b0b4f9f8c70d402a5b45b299bc5ec577eb98640e2a9cfcbf94cb6c3069.jpg" alt="제로글루 천연펄프 뽑아쓰는 키친타올" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">제로글루 천연펄프 뽑아쓰는 키친타올</div>
+                <div class="product-price-container">
+                    <span class="original-price">10,410원</span>
+                    <span class="sale-price">10,410원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8405237372&itemId=24174430292&vendorItemId=86388845810&traceid=V0-113-6a6fd70ccb53dbed" target="_blank" rel="noopener sponsored">
+            <img src="https://image12.coupangcdn.com/image/vendor_inventory/5d75/55786c7df9658eb2f8f6be1334643d892409cfb5eff048f58e29629ba8a3.png" alt="한빛 무인쇄 실속형종이컵 180ml 1000개입 1박스" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">한빛 무인쇄 실속형종이컵 180ml 1000개입 1박스</div>
+                <div class="product-price-container">
+                    <span class="original-price">10,990원</span>
+                    <span class="sale-price">10,990원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8678165222&itemId=25191687035&vendorItemId=92188421597&traceid=V0-113-51d7078f4c5ce977" target="_blank" rel="noopener sponsored">
+            <img src="https://image1.coupangcdn.com/image/retail/images/319983360963501-1c04ff54-50ae-41d6-abca-fc79581d286d.jpg" alt="코멧 일회용 수세미" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">코멧 일회용 수세미</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,690원</span>
+                    <span class="sale-price">4,690원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6403461534&itemId=23546100239&vendorItemId=85476361054&traceid=V0-113-bc891eeba760f7b9" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/1846713219536532-dbc5e005-63fa-46f5-97a4-ad6cb580b6cd.jpg" alt="생활공작소 뽑아쓰는 무표백 천연펄프 키친타올" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">생활공작소 뽑아쓰는 무표백 천연펄프 키친타올</div>
+                <div class="product-price-container">
+                    <span class="original-price">7,700원</span>
+                    <span class="sale-price">7,700원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>
