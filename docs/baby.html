@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출산/유아동 핫딜 - 쿠팡 핫딜</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #FF4B2B, #FF416C);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .header h1 a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header h1 a:hover {
+            opacity: 0.9;
+        }
+        
+        .header nav {
+            margin-top: 10px;
+        }
+        
+        .header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+        
+        .header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            border-bottom: 3px solid #FF416C;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .product-card a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .product-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .badge.rocket {
+            background-color: #FF4B2B;
+            color: white;
+        }
+        
+        .badge.free-shipping {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .product-info {
+            padding: 10px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            height: 3em;
+            line-height: 1.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 5px;
+        }
+        
+        .product-price-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .original-price {
+            font-size: 12px;
+            color: #999;
+            text-decoration: line-through;
+        }
+        
+        .sale-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d0021b;
+        }
+        
+        .discount-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-color: #d0021b;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .badge-all-time-low {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #FF1744;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 11;
+            box-shadow: 0 2px 6px rgba(255, 23, 68, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        
+        .category-link {
+            display: block;
+            padding: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background-color: #333;
+            color: #aaa;
+            font-size: 12px;
+        }
+        
+        /* 모바일 대응 CSS */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header nav a {
+                font-size: 12px;
+            }
+            
+            .container {
+                padding: 0 10px;
+            }
+            
+            .grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .product-card {
+                width: 150px;
+                min-width: 150px;
+            }
+            
+            .product-card img {
+                height: 120px;
+            }
+            
+            .product-info {
+                padding: 8px;
+            }
+            
+            .product-name {
+                font-size: 11px;
+                height: 2.5em;
+                line-height: 1.4em;
+                margin-bottom: 4px;
+            }
+            
+            .original-price {
+                font-size: 10px;
+            }
+            
+            .sale-price {
+                font-size: 14px;
+            }
+            
+            .discount-badge {
+                padding: 4px 8px;
+                font-size: 11px;
+                top: 6px;
+                left: 6px;
+            }
+            
+            .section-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .product-card {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1><a href="index.html">🏆 쿠팡 파트너스 딜 사이트</a></h1>
+        <nav>
+            <a href="category.html">전체 카테고리 보기</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        
+        <div class="category-detail-section">
+            <h2 class="section-title">출산/유아동 핫딜</h2>
+            <div class="grid-container">
+                
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6429602575&itemId=12949443&vendorItemId=3019803096&traceid=V0-113-756cad25a4d6a763" target="_blank" rel="noopener sponsored">
+            <img src="https://image3.coupangcdn.com/image/1025_amir_coupang_oct_80k/0390/d9edf2d53d002469220171d6e5c6c3f33c96d6cb5b0cf4a5f0d96851c8e3.jpg" alt="고운발 명품 크림" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">고운발 명품 크림</div>
+                <div class="product-price-container">
+                    <span class="original-price">4,490원</span>
+                    <span class="sale-price">4,490원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6945258911&itemId=18036947987&vendorItemId=85191358457&traceid=V0-113-963b13d84d62961d" target="_blank" rel="noopener sponsored">
+            <img src="https://img3a.coupangcdn.com/image/retail/images/413883168832509-b6247333-892a-4f17-ad6e-058721af32b0.png" alt="도브 포밍 핸드워시 딥 모이스처" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">도브 포밍 핸드워시 딥 모이스처</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,900원</span>
+                    <span class="sale-price">5,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6789548230&itemId=7680088915&vendorItemId=74970391620&traceid=V0-113-85a44be9cfccd894" target="_blank" rel="noopener sponsored">
+            <img src="https://image12.coupangcdn.com/image/vendor_inventory/image_audit/prod/5b8a89df-4e59-4d97-aa74-d4bb6ad09d3d_fixing_v2.png" alt="케라시스 케라마이드 극손상 헤어트리트먼트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">케라시스 케라마이드 극손상 헤어트리트먼트</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,900원</span>
+                    <span class="sale-price">8,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4310015590&itemId=20275546057&vendorItemId=89272775469&traceid=V0-113-5ac31782b55c4140" target="_blank" rel="noopener sponsored">
+            <img src="https://image5.coupangcdn.com/image/retail/images/650061448244922-7f1d49ea-9847-4e4c-b5f7-dc579caa9531.jpg" alt="바세린 오리지널 프로텍팅 젤리 살브" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">바세린 오리지널 프로텍팅 젤리 살브</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,460원</span>
+                    <span class="sale-price">5,460원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1176713569&itemId=2155653933&vendorItemId=70153899684&traceid=V0-113-1916b055d546e264" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/retail/images/17077244566249-ede486c3-fb73-4b6e-88bc-25f6660b9379.jpg" alt="일리윤 히알루론 모이스춰 수분크림" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">일리윤 히알루론 모이스춰 수분크림</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,150원</span>
+                    <span class="sale-price">8,150원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=116651697&itemId=23220303309&vendorItemId=88341541079&traceid=V0-113-634b1d3d20ea63f9" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/vendor_inventory/6691/eeb8f0e81e03cf1540b88ece539872db305aebaa040f76c6513988820e1c.jpg" alt="온더바디 발을씻자 코튼 풋샴푸 레몬민트향" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">온더바디 발을씻자 코튼 풋샴푸 레몬민트향</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,350원</span>
+                    <span class="sale-price">5,350원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=1601751214&itemId=22948704040&vendorItemId=86285548424&traceid=V0-113-58e8ab42ec19d91b" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/24592501191712-640f005a-7bf8-4917-ac70-fefb101a5868.jpg" alt="[2입기획] 미샤 수퍼 아쿠아 울트라 히알론 클렌징 폼" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">[2입기획] 미샤 수퍼 아쿠아 울트라 히알론 클렌징 폼</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,100원</span>
+                    <span class="sale-price">8,100원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8633754180&itemId=17782673246&vendorItemId=86285370248&traceid=V0-113-8b215310feba58b7" target="_blank" rel="noopener sponsored">
+            <img src="https://image2.coupangcdn.com/image/retail/images/331896989978358-3aa06acf-1d7a-4fec-b359-0afef32ff336.jpg" alt="닥터지 블랙 스네일 크림 듀오" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">닥터지 블랙 스네일 크림 듀오</div>
+                <div class="product-price-container">
+                    <span class="original-price">22,000원</span>
+                    <span class="sale-price">22,000원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9019030723&itemId=19715897661&vendorItemId=85128497249&traceid=V0-113-fccb916652113c86" target="_blank" rel="noopener sponsored">
+            <img src="https://img1a.coupangcdn.com/image/retail/images/1745839222281996-013adaae-7394-495c-b435-46dc94b7fcbc.jpg" alt="세타필 모이스춰라이징 로션" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">세타필 모이스춰라이징 로션</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,520원</span>
+                    <span class="sale-price">11,520원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=319921753&itemId=18109367726&vendorItemId=4281737707&traceid=V0-113-39bb01226a9b1b15" target="_blank" rel="noopener sponsored">
+            <img src="https://image8.coupangcdn.com/image/vendor_inventory/0cfb/e603d737784881a54b91ffb60e9318752c65fdb29815cb414251aa42ec2d.jpg" alt="우르오스 남성용 올인원 스킨밀크" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">우르오스 남성용 올인원 스킨밀크</div>
+                <div class="product-price-container">
+                    <span class="original-price">23,800원</span>
+                    <span class="sale-price">23,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8208536390&itemId=16960696069&vendorItemId=80570099639&traceid=V0-113-9a5e059dd0ea17be" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/retail/images/61261617947200-57f7b2d8-1393-4ee6-8f2d-6b3af04cd7be.jpg" alt="버츠비 모이스춰라이징 립밤" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">버츠비 모이스춰라이징 립밤</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,280원</span>
+                    <span class="sale-price">8,280원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6137107869&itemId=11744003649&vendorItemId=79017906012&traceid=V0-113-b7dd8ce864dcc7c2" target="_blank" rel="noopener sponsored">
+            <img src="https://image12.coupangcdn.com/image/1025_amir_coupang_oct_80k/819b/74162ca00ba8886579a14ade6561996214550c942435092f98d84af7474f.jpg" alt="달바 워터풀 톤업 선크림 SPF 50+ PA++++" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">달바 워터풀 톤업 선크림 SPF 50+ PA++++</div>
+                <div class="product-price-container">
+                    <span class="original-price">17,800원</span>
+                    <span class="sale-price">17,800원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=9098912465&itemId=20879205389&vendorItemId=88317271627&traceid=V0-113-280fa61550f954a7" target="_blank" rel="noopener sponsored">
+            <img src="https://image7.coupangcdn.com/image/retail/images/787780578601419-45d8633f-4710-445f-98b2-121bcb1dda92.jpg" alt="더페이스샵 데일리 코튼 면봉" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">더페이스샵 데일리 코튼 면봉</div>
+                <div class="product-price-container">
+                    <span class="original-price">1,400원</span>
+                    <span class="sale-price">1,400원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=5205138931&itemId=18044793093&vendorItemId=85199041808&traceid=V0-113-7601ef489708a8eb" target="_blank" rel="noopener sponsored">
+            <img src="https://img2a.coupangcdn.com/image/retail/images/1366518160587057-4fe0926f-8c74-4ed6-97e7-004d9eb35516.jpg" alt="이니스프리 노세범 미네랄 파우더 5g" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">이니스프리 노세범 미네랄 파우더 5g</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,130원</span>
+                    <span class="sale-price">5,130원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8370947658&itemId=16848033905&vendorItemId=71207420901&traceid=V0-113-48176336e1bbaa1f" target="_blank" rel="noopener sponsored">
+            <img src="https://image10.coupangcdn.com/image/vendor_inventory/image_audit/prod/9a01f470-0e69-401c-a71a-51935f50344b_fixing_v2.png" alt="마녀공장 퓨어 클렌징 오일" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">마녀공장 퓨어 클렌징 오일</div>
+                <div class="product-price-container">
+                    <span class="original-price">17,020원</span>
+                    <span class="sale-price">17,020원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=7650005374&itemId=20352225420&vendorItemId=82798549277&traceid=V0-113-e2ee9b7f11887fc6" target="_blank" rel="noopener sponsored">
+            <img src="https://img5a.coupangcdn.com/image/retail/images/276549413442305-ce101023-9a5a-4899-9d3c-806b15a348c8.jpg" alt="미쟝센 퍼펙트 오리지널 헤어 세럼" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">미쟝센 퍼펙트 오리지널 헤어 세럼</div>
+                <div class="product-price-container">
+                    <span class="original-price">8,500원</span>
+                    <span class="sale-price">8,500원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=8215941815&itemId=20220454094&vendorItemId=86771189929&traceid=V0-113-94a4250af31dae4f" target="_blank" rel="noopener sponsored">
+            <img src="https://image4.coupangcdn.com/image/retail/images/430251062304243-7a383543-8aad-48df-ab54-6fe835da3e7d.jpg" alt="달바 화이트 트러플 프라임 인텐시브 세럼" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">달바 화이트 트러플 프라임 인텐시브 세럼</div>
+                <div class="product-price-container">
+                    <span class="original-price">27,900원</span>
+                    <span class="sale-price">27,900원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=4352455743&itemId=18537172463&vendorItemId=80007190663&traceid=V0-113-14131e23008b40cd" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/retail/images/646998313853320-825a038d-f4c0-477f-9932-32e22f00abc2.jpg" alt="에스트라 아토베리어 365 크림 미스트" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">에스트라 아토베리어 365 크림 미스트</div>
+                <div class="product-price-container">
+                    <span class="original-price">14,550원</span>
+                    <span class="sale-price">14,550원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=130666514&itemId=384626945&vendorItemId=71648172803&traceid=V0-113-7286c5c731e6adce" target="_blank" rel="noopener sponsored">
+            <img src="https://img5c.coupangcdn.com/image/vendor_inventory/a2cf/a89bc0253a2ffc7a64e029aa90e53f0725b4a97cefef0a521286fd5fb316.jpg" alt="닥터브로너스 립밤" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">닥터브로너스 립밤</div>
+                <div class="product-price-container">
+                    <span class="original-price">5,440원</span>
+                    <span class="sale-price">5,440원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+    <div class="product-card">
+        
+        
+        <a href="https://link.coupang.com/re/AFFSDP?lptag=AF3385988&subid=leesmcoupang&pageKey=6936824598&itemId=24645554792&vendorItemId=91953859842&traceid=V0-113-e387ed9f52c0d8d0" target="_blank" rel="noopener sponsored">
+            <img src="https://image6.coupangcdn.com/image/retail/images/841150725297812-faffeba5-6077-4288-a2ee-0947f44f7b74.jpg" alt="일리윤 세라마이드 아토 로션 무향" loading="lazy">
+            <div class="product-info">
+                <div class="product-name">일리윤 세라마이드 아토 로션 무향</div>
+                <div class="product-price-container">
+                    <span class="original-price">11,670원</span>
+                    <span class="sale-price">11,670원</span>
+                </div>
+            </div>
+        </a>
+    </div>
+    
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>이 사이트는 쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>
+        <p>© 2025 쿠팡 파트너스 딜 사이트 | 자동 업데이트 시스템</p>
+    </footer>
+</body>
+</html>

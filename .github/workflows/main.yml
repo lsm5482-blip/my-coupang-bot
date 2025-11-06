@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+        persist-credentials: true
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -24,14 +26,19 @@ jobs:
     - name: Check installed packages
       run: pip list
 
-    - name: Run Script
+    - name: Run Python script to generate index.html
+      run: python make_html.py
       env:
         COUPANG_ACCESS_KEY: ${{ secrets.COUPANG_ACCESS_KEY }}
         COUPANG_SECRET_KEY: ${{ secrets.COUPANG_SECRET_KEY }}
         COUPANG_CHANNEL_ID: ${{ secrets.COUPANG_CHANNEL_ID }}
         TZ: 'Asia/Seoul' # <-- 한국 시간
-      run: |
-        python make_html.py
+
+    - name: Auto-commit price_history.json
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: "Update price_history.json (Auto)"
+        file_pattern: price_history.json
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3

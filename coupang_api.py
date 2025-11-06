@@ -96,7 +96,7 @@ class CoupangApiHandler:
     def get_special_event_list(self):
         """기획전 목록 조회 API"""
         METHOD = "GET"
-        PATH = "/v2/providers/affiliate_open_api/apis/openapi/v1/products/special-events"
+        PATH = "/v2/providers/affiliate_open_api/apis/openapi/v1/events"
         QUERY = f"subId={self.channel_id}"
         
         return self._request_api(METHOD, PATH, QUERY)
@@ -104,7 +104,7 @@ class CoupangApiHandler:
     def get_special_event_products(self, event_id):
         """기획전 상품 목록 조회 API"""
         METHOD = "GET"
-        PATH = f"/v2/providers/affiliate_open_api/apis/openapi/v1/products/special-events/{event_id}/products"
+        PATH = f"/v2/providers/affiliate_open_api/apis/openapi/v1/events/special/{event_id}/products"
         QUERY = f"subId={self.channel_id}"
         
         return self._request_api(METHOD, PATH, QUERY)
